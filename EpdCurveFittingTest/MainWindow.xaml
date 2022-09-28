@@ -1,0 +1,137 @@
+﻿<Window x:Class="EpdCurveFittingTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EpdCurveFittingTest"
+        xmlns:userCtrls="clr-namespace:EpdCurveFittingTest.UserControls"
+        mc:Ignorable="d"
+        Title="Testing EPD Curve matching" Height="809" Width="1280" WindowStyle="None" AllowsTransparency="True" Background="Transparent" MinWidth="800" MinHeight="600" MouseDown="Window_MouseDown" >
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            CaptionHeight="0"
+            ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <!--<ObjectDataProvider x:Key="FindCriteria" ObjectType="{x:Type src:TestOptions}" />-->
+        <local:RadioBoolToIntConverter x:Key="RadioBoolToIntConverter" />
+    </Window.Resources>
+
+    <Border Margin="0,0,0,0" BorderBrush="Black" BorderThickness="2,2,2,2" CornerRadius="10,10,0,0">
+        <Border.Background>
+            <LinearGradientBrush EndPoint="0.504,1.5" StartPoint="0.504,0.03">
+                <GradientStop Color="#FF7D8CE1" Offset="0"/>
+                <GradientStop Color="#FFEBF0F0" Offset="0.567"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        <Grid OpacityMask="#FFA80000" >
+            <Border Margin="6,6,6,6" BorderBrush="#FFA0A0A0" BorderThickness="1,1,1,1" CornerRadius="8,8,0,0" Background="#FFC9C997" HorizontalAlignment="Stretch" >
+                <Grid>
+                    <Image Source="Ellipsometer.png" Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,-4,0,0" />
+                    <TextBlock Height="23" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Text="{Binding Path=Title}" Margin="40,4,0,0"/>
+                    <Button Margin="0,2,66,0" Background="Transparent" Name="btnMinimise" VerticalAlignment="Top" HorizontalAlignment="Right" BorderThickness="0" Width="28" Height="26" Click="btnMinimise_Click" Grid.Column="1" >
+                        <StackPanel>
+                            <Image Source="Resources/Minimise.png" Stretch="None" />
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="0,2,36,0" Background="Transparent" Name="btnMaximise" VerticalAlignment="Top" HorizontalAlignment="Right" BorderThickness="0" Width="28" Height="26" Click="btnMaximise_Click" Grid.Column="1" >
+                        <StackPanel>
+                            <Image Name="imgMaximised" Source="Resources/Maximise.png" Stretch="None" ToolTipService.ToolTip = "{Binding Path=MaximizeRestoreStr, ElementName=mainWindow}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="0,2,6,0" Background="Transparent" Name="btnExit" VerticalAlignment="Top" HorizontalAlignment="Right" BorderThickness="0" Width="28" Height="26" Click="btnExit_Click" Grid.Column="1" >
+                        <StackPanel>
+                            <Image Source="Resources/Close.png" Stretch="None" />
+                        </StackPanel>
+                    </Button>
+                    <Grid Background="#FFFFFFC9" Margin="0,32,0,0" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="34"/>
+                            <RowDefinition Height="34"/>
+                            <RowDefinition Height="8"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="160"/>
+                        </Grid.ColumnDefinitions>
+
+                        <userCtrls:Viewport MinZoom="1" MaxZoom="50" ZoomSpeed="1.1" Margin="10,10,10,10" >
+                            <Grid Background="Bisque">
+                                <userCtrls:JollyGraph x:Name="myChart" />
+                            </Grid>
+                        </userCtrls:Viewport>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal"  >
+                            <Button Name="btnLoadMeasured" Content="Load Measured" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="30" Width="90" Click="btnLoadMeasured_Click" Grid.Row="1" Margin="5,0,0,0"/>
+                            <TextBox Text="{Binding Path=FilenameMeasured}" Height="30" FontSize="18" Grid.Row="1" Margin="5,0,5,0" Width="700" VerticalAlignment="Center" Grid.ColumnSpan="5"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal"  >
+                            <Button Name="btnLoadModel" Content="Load Model" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="30" Width="90" Click="btnLoadModel_Click" Grid.Row="1" Margin="5,0,0,0"/>
+                            <TextBox Text="{Binding Path=FilenameModel}" Height="30" FontSize="18" Grid.Row="1" Margin="5,0,5,0" Width="700" VerticalAlignment="Center" />
+                            <Button Name="btnStartStop" Content="Start" Grid.Row="2" Grid.Column="1" Click="btnStartStop_Click" Margin="20,0,0,0" Width="60"/>
+                        </StackPanel>
+
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical"  Margin="5,10,0,0" Grid.ColumnSpan="2">
+                            <!--<Label Content="T Gain" FontSize="14" FontWeight="Bold" Visibility="Collapsed" />-->
+                            <Label Content="Y Offset" FontSize="14" FontWeight="Bold" />
+                            <Label Content="Y Gain" FontSize="14" FontWeight="Bold" />
+                            <Label Content="Expected dep rate" FontSize="14" FontWeight="Bold" />
+                            <Label Content="RMS value" FontSize="14" FontWeight="Bold" />
+                            <Label Content="Best norm" FontSize="14" FontWeight="Bold" />
+
+                            <Label Content="Ignore before (s)" FontSize="14" FontWeight="Bold" Margin="0,56,0,0"/>
+                            <Label Content="Fit every (s)" FontSize="14" FontWeight="Bold" />
+                            <Label Content="Fitting range (s)" FontSize="14" FontWeight="Bold" />
+                            <Label Content="Req thickness (nm)" FontSize="14" FontWeight="Bold" />
+                            <Label Content="RMS error at" FontSize="14" FontWeight="Bold" />
+
+                            <Label Content="Thickness (nm)" FontSize="14" FontWeight="Bold" Margin="0,50,0,0"/>
+                            <Label Content="Dep rate (nm/min)" FontSize="14" FontWeight="Bold" />
+
+                            <CheckBox Content="Replot all" FontSize="14" FontWeight="Bold" Margin="0,50,0,0" IsChecked="{Binding Path=ReplotAll, Mode=TwoWay}"/>
+                            <CheckBox Content="Keep Fit Params" FontSize="14" FontWeight="Bold" Margin="0,0,0,0" IsChecked="{Binding Path=KeepFitParams, Mode=TwoWay}"/>
+                            <!--<CheckBox Content="Use suggestion 1a" FontSize="14" FontWeight="Bold" Margin="0,20,0,0" IsChecked="{Binding Path=UseSuggestion1a, Mode=TwoWay}"/>-->
+                            <Label Content="Calculated Y Offset" FontSize="14" FontWeight="Bold" Margin="0,36,0,0"/>
+                            <Label Content="Calculated Y Gain" FontSize="14" FontWeight="Bold" />
+                        </StackPanel>
+
+                        <StackPanel Margin="5,-28,0,0" Grid.Row="1" Grid.RowSpan="5" Orientation="Vertical" Grid.Column="1">
+                            <RadioButton GroupName="Speed" Content="X1" IsChecked="{Binding Path=SpeedDelay, Converter={StaticResource RadioBoolToIntConverter}, ConverterParameter=1000}"/>
+                            <RadioButton GroupName="Speed" Content="X2" Margin="0,4,0,0" IsChecked="{Binding Path=SpeedDelay, Converter={StaticResource RadioBoolToIntConverter}, ConverterParameter=500}"/>
+                            <RadioButton GroupName="Speed" Content="X4" Margin="0,4,0,0" IsChecked="{Binding Path=SpeedDelay, Converter={StaticResource RadioBoolToIntConverter}, ConverterParameter=250}"/>
+                            <RadioButton GroupName="Speed" Content="X10" Margin="0,4,0,0" IsChecked="{Binding Path=SpeedDelay, Converter={StaticResource RadioBoolToIntConverter}, ConverterParameter=100}"/>
+                            <RadioButton GroupName="Speed" Content="X20" Margin="0,4,0,0" IsChecked="{Binding Path=SpeedDelay, Converter={StaticResource RadioBoolToIntConverter}, ConverterParameter=50}"/>
+                        </StackPanel>
+
+
+                        <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Vertical" Margin="5,10,0,0">
+                            <!--<TextBox Text="{Binding TGain}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0" IsReadOnly="True" Visibility="Collapsed" />-->
+                            <TextBox Text="{Binding YOffset, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+                            <TextBox Text="{Binding YGain, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+                            <TextBox Text="{Binding ExpectedDepthRate, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0" />
+                            <TextBox Text="{Binding RMSError, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0" IsReadOnly="True" />
+                            <TextBox Text="{Binding BestNorm, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0" IsReadOnly="True" />
+
+                            <TextBox Text="{Binding IgnoreBefore}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,50,0,0"/>
+                            <TextBox Text="{Binding FitEvery}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+                            <TextBox Text="{Binding FittingRange}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+                            <TextBox Text="{Binding RequiredThickness}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+                            <TextBox Text="{Binding RMSErrorAt}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+
+                            <TextBox Text="{Binding Thickness, StringFormat={}{0:F3}}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,46,0,0" IsReadOnly="True"/>
+                            <TextBox Text="{Binding DepthRate, StringFormat={}{0:F3}}" Width="100" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0" IsReadOnly="True"/>
+
+                            <TextBox Text="{Binding CalculatedYOffset, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,122,0,0"/>
+                            <TextBox Text="{Binding CalculatedYGain, StringFormat={}{0:F3}}" Width="140" Height="28" HorizontalAlignment="Left" FontSize="16" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
